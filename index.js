@@ -1,21 +1,22 @@
-const express = require("express");
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+
 const app = express();
-const path = require("path");
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+app.get('/:page?', (req, res) => {
+  const page = req.params.page || 'index'; // Default to "index" for "/"
+  const filePath = path.join(__dirname, 'public', `${page}.html`);
 
-app.get("/about", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "about.html"));
-});
-
-app.get("/contact-me", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "contact-me.html"));
-});
-
-app.get("*", (req, res) => {
-  res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      // If file does not exist, serve the 404 page
+      res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+    } else {
+      // Serve the requested page
+      res.sendFile(filePath);
+    }
+  });
 });
 
 const PORT = process.env.PORT || 8080;
@@ -23,6 +24,38 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Express app - listening on port ${PORT}!`);
 });
+
+// First express solution below
+
+// const express = require("express");
+// const app = express();
+// const path = require("path");
+
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, "public", "index.html"));
+// });
+
+// app.get("/about", (req, res) => {
+//   res.sendFile(path.join(__dirname, "public", "about.html"));
+// });
+
+// app.get("/contact-me", (req, res) => {
+//   res.sendFile(path.join(__dirname, "public", "contact-me.html"));
+// });
+
+// app.get("*", (req, res) => {
+//   res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
+// });
+
+// const PORT = process.env.PORT || 8080;
+
+// app.listen(PORT, () => {
+//   console.log(`Express app - listening on port ${PORT}!`);
+// });
+
+//
+//
+//
 
 // Code for vanilla NodeJS below
 
